@@ -22,7 +22,9 @@ export const uTrack = async (
         },
       }),
     });
-  } catch (_) {
-    console.log("umami error");
+  } catch (err) {
+    // low priority error. no action needed.
+
+    console.error(err);
   }
 };
