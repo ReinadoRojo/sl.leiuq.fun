@@ -1,31 +1,39 @@
-import { integer, sqliteTable, text, primaryKey, foreignKey, uniqueIndex, unique } from "drizzle-orm/sqlite-core"
-import { createClient } from "@libsql/client"
-import { drizzle } from "drizzle-orm/libsql"
-import type { AdapterAccountType } from "next-auth/adapters"
+import {
+  integer,
+  sqliteTable,
+  text,
+  primaryKey,
+  uniqueIndex,
+  unique,
+} from "drizzle-orm/sqlite-core";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
+import type { AdapterAccountType } from "next-auth/adapters";
 
-import { create } from "secure-id"
-import { generateToken } from "@/utils/tokens"
-const { generate: idGenerate } = create('wertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOPASDFGHJKLÑZXCVBNM')(16)
- 
+import { create } from "secure-id";
+import { generateToken } from "@/utils/tokens";
+const { generate: idGenerate } = create(
+  "wertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOPASDFGHJKLÑZXCVBNM"
+)(16);
+
 const url = process.env.NEXT_TURSO_DB_URL?.trim();
 if (url === undefined) {
-throw new Error("TURSO_DB_URL is not defined");
+  throw new Error("TURSO_DB_URL is not defined");
 }
 
 const authToken = process.env.NEXT_TURSO_DB_AUTH_TOKEN?.trim();
 if (authToken === undefined) {
-if (!url.includes("file:")) {
+  if (!url.includes("file:")) {
     throw new Error("TURSO_DB_AUTH_TOKEN is not defined");
-}
+  }
 }
 
 const client = createClient({
-    url: process.env.NEXT_TURSO_DB_URL as string,
-    authToken: process.env.NEXT_TURSO_DB_AUTH_TOKEN as string,
+  url: process.env.NEXT_TURSO_DB_URL as string,
+  authToken: process.env.NEXT_TURSO_DB_AUTH_TOKEN as string,
 });
 
-export const db = drizzle(client)
-
+export const db = drizzle(client);
 
 //
 // Schema
@@ -33,13 +41,14 @@ export const db = drizzle(client)
 
 export const users = sqliteTable("user", {
   id: text("id")
-    .primaryKey().$defaultFn(() => idGenerate()),
+    .primaryKey()
+    .$defaultFn(() => idGenerate()),
   name: text("name"),
   email: text("email").unique(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
-})
- 
+});
+
 export const accounts = sqliteTable(
   "account",
   {
@@ -62,16 +71,16 @@ export const accounts = sqliteTable(
       columns: [account.provider, account.providerAccountId],
     }),
   })
-)
- 
+);
+
 export const sessions = sqliteTable("session", {
   sessionToken: text("sessionToken").primaryKey(),
   userId: text("userId")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   expires: integer("expires", { mode: "timestamp_ms" }).notNull(),
-})
- 
+});
+
 export const verificationTokens = sqliteTable(
   "verificationToken",
   {
@@ -84,8 +93,8 @@ export const verificationTokens = sqliteTable(
       columns: [verificationToken.identifier, verificationToken.token],
     }),
   })
-)
- 
+);
+
 export const authenticators = sqliteTable(
   "authenticator",
   {
@@ -107,23 +116,39 @@ export const authenticators = sqliteTable(
       columns: [authenticator.userId, authenticator.credentialID],
     }),
   })
-)
+);
 
-export const links = sqliteTable("links", {
-    id: text("id", { mode: "text" }).primaryKey().$defaultFn(() => idGenerate()),
+export const links = sqliteTable(
+  "links",
+  {
+    id: text("id", { mode: "text" })
+      .primaryKey()
+      .$defaultFn(() => idGenerate()),
     shortUrl: text("shortUrl", { mode: "text" }).notNull(),
     longUrl: text("longUrl", { mode: "text" }).notNull(),
     apiKeyOrigin: text("apiKeyOrigin", { mode: "text" }).notNull(),
-    visits: integer("visits", { mode: "number" }) .notNull().default(0),
-}, (table) => ({
+    visits: integer("visits", { mode: "number" }).notNull().default(0),
+  },
+  (table) => ({
     unque_shortUrl: unique("shortUrl").on(table.shortUrl),
-}))
+  })
+);
 
-export const apiTokens = sqliteTable("apiTokens", {
-    id: text("id", { mode: "text" }).primaryKey().$defaultFn(() => idGenerate()),
-    apiToken: text("apiToken", { mode: "text" }).notNull().$defaultFn(() => generateToken()),
-    ownerId: text("ownerId", { mode: "text" }).notNull().references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
-}, (tb) => ({
+export const apiTokens = sqliteTable(
+  "apiTokens",
+  {
+    id: text("id", { mode: "text" })
+      .primaryKey()
+      .$defaultFn(() => idGenerate()),
+    apiToken: text("apiToken", { mode: "text" })
+      .notNull()
+      .$defaultFn(() => generateToken()),
+    ownerId: text("ownerId", { mode: "text" })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
+  },
+  (tb) => ({
     unq_apiToken: unique("apiToken").on(tb.apiToken),
     unq_idx_ownerId: uniqueIndex("ownerId").on(tb.ownerId),
-}))
+  })
+);

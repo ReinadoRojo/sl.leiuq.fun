@@ -1,14 +1,9 @@
-import NextAuth from "next-auth"
-import { DrizzleAdapter } from "@auth/drizzle-adapter"
-import { db, users, sessions, authenticators, verificationTokens, accounts } from "@/db/schema"
- 
+import NextAuth from "next-auth";
+import GitHub from "next-auth/providers/github";
+
+import { authConfig } from "./auth.config";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    adapter: DrizzleAdapter(db, {
-        usersTable: users,
-        accountsTable: accounts,
-        sessionsTable: sessions,
-        verificationTokensTable: verificationTokens,
-        authenticatorsTable: authenticators,
-    }),
-    providers: [],
-})
+  ...authConfig,
+  providers: [GitHub],
+});
