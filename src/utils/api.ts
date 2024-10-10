@@ -3,7 +3,6 @@ import { uTrack } from "./umami";
 import { eq } from "drizzle-orm";
 import { create } from "secure-id";
 
-
 export const cartography = async (l: number) => {
   // 5 digits
   const fiveNumbers = await (
@@ -24,7 +23,7 @@ export const cartography = async (l: number) => {
     result.push(`${fiveNumbers[i]}${fiveStrings[i]}`);
   }
 
-  const { generate } = create(result.join(''))(64)
+  const { generate } = create(result.join(""))(64);
 
   const word = Buffer.from(generate()).toString("base64url");
   const wordLength = word.length;
@@ -41,67 +40,84 @@ export const createLink = async (
   apiKey: string
 ): Promise<[boolean, string | null | undefined]> => {
   try {
-    await db.insert(links).values({
-      shortUrl,
-      longUrl,
-      apiKeyOrigin: apiKey,
-    }).execute()
+    await db
+      .insert(links)
+      .values({
+        shortUrl,
+        longUrl,
+        apiKeyOrigin: apiKey,
+      })
+      .execute();
 
     await uTrack("createLink", {
       apiKey,
       url: longUrl,
     });
 
-    return [true, null]
-  }
-  catch(err) {
+    return [true, null];
+  } catch (err) {
     return [false, "Something went wrong when creating the link"];
   }
-}
+};
 
-export const getLink = async (shortUrl: string): Promise<[any | null, string | null | undefined]> => {
+export const getLink = async (
+  shortUrl: string
+): Promise<[any | null, string | null | undefined]> => {
   try {
-    const dbResult = await db.select({
-      id: links.id,
-      shortUrl: links.shortUrl,
-      longUrl: links.longUrl
-    }).from(links).where(eq(links.shortUrl, shortUrl)).execute();
+    const dbResult = await db
+      .select({
+        id: links.id,
+        shortUrl: links.shortUrl,
+        longUrl: links.longUrl,
+      })
+      .from(links)
+      .where(eq(links.shortUrl, shortUrl))
+      .execute();
 
-    if(!dbResult || dbResult.length === 0) return [null, "We could not find the data in the database"]
+    if (!dbResult || dbResult.length === 0)
+      return [null, "We could not find the data in the database"];
 
     return [dbResult[0], null];
+  } catch (err) {
+    return [null, "Error ocurred while trying to get link."];
   }
-  catch (err){
-    return [null, "Error ocurred while trying to get link."]
-  }
-}
+};
 
-export const plusVisit = async (shortUrl: string): Promise<[boolean, string | null | undefined]> => {
+export const plusVisit = async (
+  shortUrl: string
+): Promise<[boolean, string | null | undefined]> => {
   try {
-    const dbResult = await db.select({
-      id: links.id,
-      visits: links.visits,
-    }).from(links).where(eq(links.shortUrl, shortUrl)).execute();
+    const dbResult = await db
+      .select({
+        id: links.id,
+        visits: links.visits,
+      })
+      .from(links)
+      .where(eq(links.shortUrl, shortUrl))
+      .execute();
 
-    if(!dbResult) return [false, "Error"]
+    if (!dbResult) return [false, "Error"];
 
     const newVisits = dbResult[0].visits + 1;
 
-    await db.update(links).set({
-      visits: newVisits
-    }).where(eq(links.id, dbResult[0].id)).execute()
+    await db
+      .update(links)
+      .set({
+        visits: newVisits,
+      })
+      .where(eq(links.id, dbResult[0].id))
+      .execute();
 
     await uTrack("visit", {
-      shortUrl: shortUrl?.toString()
-    })
+      shortUrl: shortUrl?.toString(),
+    });
 
-    return [true, null]
-  }
-  catch(_) {
+    return [true, null];
+  } catch (_) {
     await uTrack("visitLink_error", {
       shortUrl: shortUrl?.toString(),
-    })
+    });
 
-    return [false, "Error ocurred while tracking visit."]
+    return [false, "Error ocurred while tracking visit."];
   }
-}
+};
