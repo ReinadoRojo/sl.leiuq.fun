@@ -47,7 +47,9 @@ export const users = sqliteTable("user", {
   email: text("email").unique(),
   emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
   image: text("image"),
-});
+}, (tbl) => ({
+  unq_idx_email: uniqueIndex("emailIdx").on(tbl.email)
+}));
 
 export const accounts = sqliteTable(
   "account",
