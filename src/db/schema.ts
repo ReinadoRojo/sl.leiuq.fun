@@ -13,7 +13,7 @@ import type { AdapterAccountType } from "next-auth/adapters";
 import { create } from "secure-id";
 import { generateToken } from "@/utils/tokens";
 const { generate: idGenerate } = create(
-  "wertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOPASDFGHJKLÑZXCVBNM"
+  "wertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOPASDFGHJKLZXCVBNM"
 )(16);
 
 const url = process.env.NEXT_TURSO_DB_URL?.trim();
