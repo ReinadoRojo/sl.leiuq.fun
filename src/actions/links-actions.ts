@@ -30,16 +30,8 @@ export const makeLongShort = async (formData: FormData) => {
       };
   }
 
-  // Function to determine ideal length for short URL
-  const getIdealLength = (hostnameLength: number) => {
-      return Math.max(6, Math.min(hostnameLength, 10));
-  };
-
-  // Get ideal short URL length based on hostname length
-  const idealLength = getIdealLength(url.hostname.length);
-
   // Generate a random short URL using the ideal length
-  const shortUrl = await cartography(random(6, idealLength));
+  const shortUrl = await cartography(random(6, 10));
 
   // Try inserting into the database and catch potential errors
   try {
