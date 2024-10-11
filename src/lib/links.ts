@@ -11,7 +11,21 @@ export const getLinksByApiKey = async (selectedToken: string) => {
       longUrl: links.longUrl,
     })
     .from(links)
-    .where(eq(links.apiKeyOrigin, selectedToken));
+    .where(eq(links.apikeyOrigin, selectedToken));
+
+  return dbResult;
+};
+
+export const getLinksByOwnerId = async (ownerId: string) => {
+  const dbResult = await db
+    .select({
+      id: links.id,
+      shortUrl: links.shortUrl,
+      longUrl: links.longUrl,
+      visits: links.visits,
+    })
+    .from(links)
+    .where(eq(links.ownerId, ownerId));
 
   return dbResult;
 };
