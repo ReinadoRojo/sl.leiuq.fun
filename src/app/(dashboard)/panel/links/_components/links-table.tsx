@@ -27,7 +27,7 @@ export async function TableLinks({ session }: { session: Session }) {
       <TableCaption>A list of your recent invoices.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[2/3]">URL</TableHead>
+          <TableHead className="w-auto max-w-[calc(100% * 2/3)]">URL</TableHead>
           <TableHead>Short URL</TableHead>
           <TableHead>Visits</TableHead>
           <TableHead className="text-right">Actions</TableHead>
