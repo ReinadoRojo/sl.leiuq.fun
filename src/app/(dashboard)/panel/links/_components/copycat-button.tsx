@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 
 export const CopyCatButton = ({svalue}: {svalue: string}) => {
-    const handleCopy = (e) => {
+    const handleCopy = (e: any) => {
         const thisValue = e.currentTarget.value;
         const thisUrl = `${window.location.origin}`;
 
