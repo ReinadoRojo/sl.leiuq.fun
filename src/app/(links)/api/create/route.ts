@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     // get needed
     const requestUrl = new URL(request.url);
     const apiKey = requestUrl.searchParams.get("apikey");
-    
+
     // check needed
     if (!apiKey) return new Response("unauthorized.noapikey", { status: 401 });
     if (apiKey != process.env.SECRET_API_KEY)
@@ -16,12 +16,28 @@ export async function POST(request: Request) {
     const body = await request.json();
 
     // check body
-    if (!body) return Response.json({ code: "body.notfound", error: "No body on request", data: null }, { status: 400 })
-    if (!body.url) return Response.json({ code: "body.invalid", error: "Invalid body", data: null }, { status: 400 })
+
+    // if no body - error no found (body.notfound)
+    if (!body)
+      return Response.json(
+        { code: "body.notfound", error: "No body on request", data: null },
+        { status: 400 }
+      );
+
+    // if no url on body - error invalid (body.invalid)
+    if (!body.url)
+      return Response.json(
+        { code: "body.invalid", error: "Invalid body", data: null },
+        { status: 400 }
+      );
 
     // parse url and validate
     const url = new URL(body.url);
-    if (!url.hostname) return Response.json({ code: "body.url.invalid", error: "Body URL malformed", data: null }, { status: 500 })
+    if (!url.hostname)
+      return Response.json(
+        { code: "body.url.invalid", error: "Body URL malformed", data: null },
+        { status: 500 }
+      );
 
     // plan ideal length
     const idealLength =
@@ -35,9 +51,20 @@ export async function POST(request: Request) {
     const shortUrl = await cartography(nbRandom(6, idealLength));
 
     // creating the link
-    const [succesLink, errorMessage] = await createLink(shortUrl, body.url, apiKey);
-    if (!succesLink) return Response.json({ code: "internal.db.creation", error: errorMessage, data: null }, { status: 500 })
+    const [succesLink, errorMessage] = await createLink(
+      shortUrl,
+      body.url,
+      apiKey
+    );
 
+    // if not succesful - error on db creation (internal.db.creation)
+    if (!succesLink)
+      return Response.json(
+        { code: "internal.db.creation", error: errorMessage, data: null },
+        { status: 500 }
+      );
+
+    // if no errrors - all success (success - 200)
     return Response.json(
       {
         code: "success",
@@ -45,11 +72,14 @@ export async function POST(request: Request) {
         data: {
           shortUrl: shortUrl,
           complete: `${requestUrl.protocol}//${requestUrl.host}/${shortUrl}`,
-        }
+        },
       },
       { status: 200 }
     );
   } catch (error) {
-    return Response.json({ code: "internal.general", error: "Unknown error ocurred", data: null }, { status: 500 })
+    return Response.json(
+      { code: "internal.general", error: "Unknown error ocurred", data: null },
+      { status: 500 }
+    );
   }
 }

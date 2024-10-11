@@ -1,6 +1,7 @@
 "use client";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
+import { toast } from "sonner";
 
 export default function Page() {
   const { shortUrl } = useParams();
@@ -9,7 +10,11 @@ export default function Page() {
     fetch(`/api/visit?shortUrl=${shortUrl}`)
       .then((res) => res.json())
       .then((data) => {
-        window.location.href = data.url;
+        if(data.code != "success") {
+          toast.error(data.error)
+          return;
+        }
+        window.location.href = data.data.url;
       })
       .catch((err) => console.error(err));
   }, [shortUrl]);
