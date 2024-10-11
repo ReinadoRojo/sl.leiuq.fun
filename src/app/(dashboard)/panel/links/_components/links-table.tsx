@@ -6,30 +6,29 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { getUserByEmail } from "@/lib/users"
+} from "@/components/ui/table";
+import { getUserByEmail } from "@/lib/users";
 
-import type { Session } from "next-auth"
+import type { Session } from "next-auth";
 
-export async function TableDemo({ session }: { session: Session}) {
+export async function TableLinks({ session }: { session: Session }) {
   const user = await getUserByEmail(session.user?.email as string);
-  if(!user) return null
+  if (!user) return null;
 
   const userId = user.id;
-  
 
   return (
     <Table>
-    <TableCaption>A list of your recent invoices.</TableCaption>
-    <TableHeader>
+      <TableCaption>A list of your recent invoices.</TableCaption>
+      <TableHeader>
         <TableRow>
-        <TableHead className="w-[100px]">Invoice</TableHead>
-        <TableHead>Status</TableHead>
-        <TableHead>Method</TableHead>
-        <TableHead className="text-right">Amount</TableHead>
+          <TableHead className="w-[100px]">Invoice</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Method</TableHead>
+          <TableHead className="text-right">Amount</TableHead>
         </TableRow>
-    </TableHeader>
-    <TableBody>
+      </TableHeader>
+      <TableBody>
         {/*
         {invoices.map((invoice) => (
         <TableRow key={invoice.invoice}>
@@ -40,8 +39,7 @@ export async function TableDemo({ session }: { session: Session}) {
         </TableRow>
         ))}
         */}
-    </TableBody>
+      </TableBody>
     </Table>
-  )
+  );
 }
-  
