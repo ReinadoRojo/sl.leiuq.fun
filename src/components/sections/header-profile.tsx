@@ -1,9 +1,6 @@
 "use client"
 
-import { useSession } from "next-auth/react"
-import * as React from "react"
 import { PersonIcon } from "@radix-ui/react-icons"
-
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -16,9 +13,6 @@ import { useRouter } from "next/navigation"
 
 export function HeaderProfile() {
   const router = useRouter();
-  const { data: session } = useSession()
-
-  if(!session?.user) return null
 
   return (
     <DropdownMenu>

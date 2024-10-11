@@ -1,6 +1,6 @@
 "use server";
 
-import { apiTokens, db, links } from "@/db/schema";
+import { db, links } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export const getLinksByApiKey = async (selectedToken: string) => {

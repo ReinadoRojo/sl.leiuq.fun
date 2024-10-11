@@ -12,6 +12,8 @@ import { getLinksByOwnerId } from "@/lib/links";
 import { getUserByEmail } from "@/lib/users";
 
 import type { Session } from "next-auth";
+import Link from "next/link";
+import { CopyCatButton } from "./copycat-button";
 
 export async function TableLinks({ session }: { session: Session }) {
   const user = await getUserByEmail(session.user?.email as string);
@@ -25,8 +27,8 @@ export async function TableLinks({ session }: { session: Session }) {
       <TableCaption>A list of your recent invoices.</TableCaption>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-[100px]">URL</TableHead>
-          <TableHead>Short</TableHead>
+          <TableHead className="w-[2/3]">URL</TableHead>
+          <TableHead>Short URL</TableHead>
           <TableHead>Visits</TableHead>
           <TableHead className="text-right">Actions</TableHead>
         </TableRow>
@@ -41,8 +43,16 @@ export async function TableLinks({ session }: { session: Session }) {
         ) : null}
         {links.map((lnk, idx) => (
           <TableRow key={idx}>
-            <TableCell className="font-medium">{lnk.longUrl}</TableCell>
-            <TableCell>{lnk.shortUrl}</TableCell>
+            <TableCell className="font-medium">
+              <Button asChild variant={"link"}>
+                <Link href={lnk.longUrl}>
+                  {lnk.longUrl}
+                </Link>
+              </Button>
+            </TableCell>
+            <TableCell>
+              <CopyCatButton svalue={lnk.shortUrl} />
+            </TableCell>
             <TableCell>{lnk.visits}</TableCell>
             <TableCell className="text-right">
               <Button variant="secondary">More info</Button>

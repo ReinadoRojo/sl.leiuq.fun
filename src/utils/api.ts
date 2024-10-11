@@ -45,7 +45,7 @@ export const createLink = async (
       .values({
         shortUrl,
         longUrl,
-        apiKeyOrigin: apiKey,
+        apikeyOrigin: apiKey,
       })
       .execute();
 

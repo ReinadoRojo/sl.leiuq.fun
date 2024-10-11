@@ -141,7 +141,7 @@ export const links = sqliteTable(
   },
   (table) => ({
     unque_shortUrl: unique("shortUrl").on(table.shortUrl),
-    unq_idx_ownerId: uniqueIndex("ownerId_links").on(table.ownerId),
+    idx_ownerId: index("ownerId_links").on(table.ownerId),
     idx_apikeyOrigin: index("apikeyOrigin_links").on(table.apikeyOrigin),
   })
 );
