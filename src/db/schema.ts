@@ -5,6 +5,7 @@ import {
   primaryKey,
   uniqueIndex,
   unique,
+  index,
 } from "drizzle-orm/sqlite-core";
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
@@ -39,17 +40,21 @@ export const db = drizzle(client);
 // Schema
 //
 
-export const users = sqliteTable("user", {
-  id: text("id")
-    .primaryKey()
-    .$defaultFn(() => idGenerate()),
-  name: text("name"),
-  email: text("email").unique(),
-  emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
-  image: text("image"),
-}, (tbl) => ({
-  unq_idx_email: uniqueIndex("emailIdx").on(tbl.email)
-}));
+export const users = sqliteTable(
+  "user",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => idGenerate()),
+    name: text("name"),
+    email: text("email").unique(),
+    emailVerified: integer("emailVerified", { mode: "timestamp_ms" }),
+    image: text("image"),
+  },
+  (tbl) => ({
+    unq_idx_email: uniqueIndex("emailIdx").on(tbl.email),
+  })
+);
 
 export const accounts = sqliteTable(
   "account",
@@ -128,11 +133,16 @@ export const links = sqliteTable(
       .$defaultFn(() => idGenerate()),
     shortUrl: text("shortUrl", { mode: "text" }).notNull(),
     longUrl: text("longUrl", { mode: "text" }).notNull(),
-    apiKeyOrigin: text("apiKeyOrigin", { mode: "text" }).notNull(),
     visits: integer("visits", { mode: "number" }).notNull().default(0),
+    apikeyOrigin: text("apiKeyOrigin", { mode: "text" }).default(""),
+    ownerId: text("ownerId", { mode: "text" })
+      .default("")
+      .references(() => users.id, { onDelete: "cascade", onUpdate: "cascade" }),
   },
   (table) => ({
     unque_shortUrl: unique("shortUrl").on(table.shortUrl),
+    unq_idx_ownerId: uniqueIndex("ownerId_links").on(table.ownerId),
+    idx_apikeyOrigin: index("apikeyOrigin_links").on(table.apikeyOrigin),
   })
 );
 
