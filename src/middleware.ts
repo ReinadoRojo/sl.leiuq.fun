@@ -14,7 +14,7 @@ export default auth((req) => {
   if (isPublicRoute && isAuthenticated)
     return Response.redirect(new URL(DEFAULT_REDIRECT, nextUrl));
 
-  if (isPrivate && !isAuthenticated)
+  if (isPrivateRoute && !isAuthenticated)
     return Response.redirect(new URL(ROOT, nextUrl));
 });
 
